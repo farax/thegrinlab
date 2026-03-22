@@ -597,16 +597,90 @@ footer{border-top:1px solid var(--gold-border);padding:44px 64px;display:flex;al
   .approved-title { font-size: 16px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
   .approved-sub { font-size: 13px; color: var(--text3); }
 
-  /* responsive */
+  /* ── RESPONSIVE ── */
   @media (max-width: 900px) {
     nav { padding: 0 20px; }
     .nav-links { display: none; }
+    .nav-cta .btn-ghost { display: none; }
     section { padding: 60px 20px; }
+    .demo-section { padding: 60px 20px; }
     .demo-pane.active { grid-template-columns: 1fr; }
+    .demo-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; scrollbar-width: none; }
+    .demo-tabs::-webkit-scrollbar { display: none; }
     .how-grid { grid-template-columns: 1fr; }
-    .hero-stats { gap: 24px; }
+    .hero-stats { gap: 24px; flex-wrap: wrap; justify-content: center; }
     footer { flex-direction: column; gap: 20px; text-align: center; }
     .cta-buttons { flex-direction: column; align-items: center; }
+    /* Compare table: horizontally scrollable */
+    .compare-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius); }
+    .compare-table { min-width: 560px; }
+    /* Engineer dashboard: single column */
+    #eng-grid { grid-template-columns: 1fr !important; min-height: auto !important; }
+    /* Left sidebar: horizontal scrollable avatar strip */
+    #eng-left {
+      display: flex !important;
+      flex-direction: row !important;
+      overflow-x: auto !important;
+      border-right: none !important;
+      border-bottom: 0.5px solid var(--border);
+      min-height: 0 !important;
+      padding: 8px 0 !important;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    #eng-left::-webkit-scrollbar { display: none; }
+    /* Hide team section labels in sidebar */
+    #eng-left > div:not([id]) { display: none !important; }
+    /* Engineer avatar rows: compact vertical tiles */
+    #eng-left > div[id^="erow-"] {
+      flex-direction: column !important;
+      align-items: center !important;
+      gap: 4px !important;
+      padding: 6px 10px !important;
+      min-width: 56px;
+      flex-shrink: 0;
+      border-left: none !important;
+      border-bottom: 2px solid transparent;
+    }
+    /* Hide engineer name+role text, keep avatar circle */
+    #eng-left > div[id^="erow-"] > div:nth-child(2) { display: none !important; }
+    /* Hide status dot */
+    #eng-left > div[id^="erow-"] > div:last-child { display: none !important; }
+    /* Velocity stats: 2×2 grid */
+    #eng-velocity { grid-template-columns: repeat(2, 1fr) !important; }
+    /* Right panel: hidden on mobile (too dense; left+centre is enough) */
+    #eng-right { display: none !important; }
+    /* Dashboard top bar badges: allow shrink on small tablets */
+    #dash-status-badges { flex-shrink: 1; overflow: hidden; }
+    .cta-section { padding: 80px 24px; }
+    .quote-block { padding: 32px 24px; }
+  }
+
+  @media (max-width: 600px) {
+    nav { height: 52px; padding: 0 16px; }
+    .hero { padding: 72px 16px 52px; }
+    .hero h1 { font-size: clamp(32px, 9vw, 52px); }
+    .hero-sub { font-size: 15px; }
+    .hero-actions { flex-direction: column; gap: 10px; }
+    .btn-hero, .btn-hero-ghost { width: 100%; text-align: center; justify-content: center; }
+    .hero-stat-num { font-size: 26px; }
+    section { padding: 48px 16px; }
+    .demo-section { padding: 48px 16px; }
+    .back-bar { padding: 0 16px; }
+    .back-crumb { display: none; }
+    .back-sep { display: none; }
+    /* Signal feed items: hide confidence bar on tiny screens */
+    .signal-intent .confidence-bar { display: none; }
+    /* Integration grid tighter */
+    .integration-grid { gap: 6px; }
+    .integration-pill { padding: 9px 12px; font-size: 12px; }
+    /* Dashboard top bar: hide status badges on small phones */
+    #dash-status-badges { display: none !important; }
+    /* Profile viewer notice: too wide for small screens */
+    #eng-profile-notice { display: none !important; }
+    /* Quote */
+    .quote-text { font-size: 18px; }
+    .cta-section h2 { font-size: clamp(26px, 7vw, 42px); }
   }
 
 </style>
@@ -699,10 +773,10 @@ footer{border-top:1px solid var(--gold-border);padding:44px 64px;display:flex;al
   <div class="back-bar">
     <button class="back-btn" id="back-btn">
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 7H3M7 3L3 7l4 4"/></svg>
-      Back to Grin Lab
+      Back to The Grin Lab
     </button>
     <div class="back-sep"></div>
-    <div class="back-crumb">Grin Lab / <span>Meridian</span></div>
+    <div class="back-crumb">The Grin Lab / <span>Meridian</span></div>
   </div>
   
 
@@ -1082,7 +1156,7 @@ footer{border-top:1px solid var(--gold-border);padding:44px 64px;display:flex;al
         <button class="dtab" onclick="setDashTab('risk')" id="dtab-risk" style="padding:0 14px; height:44px; border:none; background:transparent; color:var(--text3); font-size:12px; cursor:pointer; font-family:var(--font); border-bottom:2px solid transparent; white-space:nowrap;">Risk Report</button>
         <button class="dtab" onclick="setDashTab('proposals')" id="dtab-proposals" style="padding:0 14px; height:44px; border:none; background:transparent; color:var(--text3); font-size:12px; cursor:pointer; font-family:var(--font); border-bottom:2px solid transparent; white-space:nowrap;">Proposals</button>
       </div>
-      <div style="margin-left:auto; display:flex; gap:6px; align-items:center; flex-shrink:0;">
+      <div id="dash-status-badges" style="margin-left:auto; display:flex; gap:6px; align-items:center; flex-shrink:0;">
         <span style="font-size:10px;font-weight:600;font-family:var(--font-mono);background:var(--green-dim);color:var(--green);padding:3px 8px;border-radius:4px;border:0.5px solid rgba(29,184,122,0.25);">OBSERVER ACTIVE</span>
         <span style="font-size:10px;font-weight:600;font-family:var(--font-mono);background:var(--blue-dim);color:var(--blue);padding:3px 8px;border-radius:4px;border:0.5px solid rgba(74,158,232,0.2);">WRITE-BACK: ON</span>
         <span style="font-size:10px;font-weight:600;font-family:var(--font-mono);background:var(--amber-dim);color:var(--amber);padding:3px 8px;border-radius:4px;border:0.5px solid rgba(232,168,37,0.2);">7 SIGNALS TODAY</span>
@@ -1090,10 +1164,10 @@ footer{border-top:1px solid var(--gold-border);padding:44px 64px;display:flex;al
     </div>
 
     <!-- Main 3-col layout -->
-    <div style="display:grid; grid-template-columns:200px 1fr 210px; min-height:640px;">
+    <div id="eng-grid" style="display:grid; grid-template-columns:200px 1fr 210px; min-height:640px;">
 
       <!-- LEFT: Team sidebar -->
-      <div style="border-right:0.5px solid var(--border); background:#0A0D10;">
+      <div id="eng-left" style="border-right:0.5px solid var(--border); background:#0A0D10;">
         <div style="padding:12px 12px 6px; font-size:10px; font-weight:600; color:var(--text3); font-family:var(--font-mono); letter-spacing:0.08em;">TEAM · PLATFORM</div>
         <div id="erow-alice" onclick="selectEng('alice')" style="display:flex;align-items:center;gap:9px;padding:8px 12px;cursor:pointer;background:rgba(29,184,122,0.08);border-left:2px solid var(--green);">
           <div style="width:28px;height:28px;border-radius:50%;background:#0E3027;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--green);flex-shrink:0;">AC</div>
@@ -1152,7 +1226,7 @@ footer{border-top:1px solid var(--gold-border);padding:44px 64px;display:flex;al
               <span style="font-size:11px;background:var(--amber-dim);color:var(--amber);padding:3px 9px;border-radius:4px;border:0.5px solid rgba(232,168,37,0.2);" id="eng-capacity-tag">59% capacity</span>
             </div>
           </div>
-          <div style="background:rgba(29,184,122,0.08);border:0.5px solid rgba(29,184,122,0.2);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--green);white-space:nowrap;flex-shrink:0;">You are viewing your own profile · All data visible to you</div>
+          <div id="eng-profile-notice" style="background:rgba(29,184,122,0.08);border:0.5px solid rgba(29,184,122,0.2);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--green);white-space:nowrap;flex-shrink:0;">You are viewing your own profile · All data visible to you</div>
         </div>
 
         <!-- Velocity -->
@@ -1320,7 +1394,7 @@ footer{border-top:1px solid var(--gold-border);padding:44px 64px;display:flex;al
       </div>
 
       <!-- RIGHT: Availability, risk, collab, performance -->
-      <div style="border-left:0.5px solid var(--border); padding:16px; background:#0A0D10; display:flex; flex-direction:column; gap:14px; overflow-y:auto;">
+      <div id="eng-right" style="border-left:0.5px solid var(--border); padding:16px; background:#0A0D10; display:flex; flex-direction:column; gap:14px; overflow-y:auto;">
 
         <!-- Availability -->
         <div>
@@ -1423,6 +1497,7 @@ footer{border-top:1px solid var(--gold-border);padding:44px 64px;display:flex;al
 <section id="compare" style="border-top: 0.5px solid var(--border);">
   <div class="section-label">Compare</div>
   <div class="section-title">What Jira can't do.<br><em>What Rovo won't do.</em></div>
+  <div class="compare-table-wrap">
   <table class="compare-table">
     <thead>
       <tr>
@@ -1477,6 +1552,7 @@ footer{border-top:1px solid var(--gold-border);padding:44px 64px;display:flex;al
       </tr>
     </tbody>
   </table>
+  </div>
 </section>
 
 <!-- INTEGRATIONS -->
