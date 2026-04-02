@@ -308,6 +308,13 @@ footer{border-top:1px solid var(--gold-border);padding:44px 64px;display:flex;al
   .demo-section {
     background: var(--bg); padding: 100px 40px;
     border-top: 0.5px solid var(--border);
+    position: relative;
+  }
+  .demo-section::before {
+    content: '';
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(29,184,122,0.4), transparent);
   }
   .demo-tabs {
     display: flex; gap: 4px; margin-top: 48px;
@@ -581,6 +588,10 @@ footer{border-top:1px solid var(--gold-border);padding:44px 64px;display:flex;al
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
   }
+  @keyframes heroSigIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
   /* ── APPROVAL STATE ── */
   .approved-state {
@@ -614,6 +625,17 @@ footer{border-top:1px solid var(--gold-border);padding:44px 64px;display:flex;al
     /* Compare table: horizontally scrollable */
     .compare-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius); }
     .compare-table { min-width: 560px; }
+    /* Engineer dashboard: single column */
+    #eng-grid { grid-template-columns: 1fr !important; min-height: auto !important; }
+    /* Hero panel: single column */
+    #hero-panel-cols { grid-template-columns: 1fr !important; }
+    #hero-panel-sidebar { display: none !important; }
+    /* Pain section: single column */
+    #pain-grid { grid-template-columns: 1fr !important; }
+    /* Stats bar: wrap */
+    #stats-bar { gap: 28px !important; flex-wrap: wrap; padding: 24px 20px !important; }
+    /* How it works: single column rows */
+    #how .how-row-inner { grid-template-columns: 1fr !important; }
     /* Engineer dashboard: single column */
     #eng-grid { grid-template-columns: 1fr !important; min-height: auto !important; }
     /* Left sidebar: horizontal scrollable avatar strip */
@@ -804,34 +826,196 @@ footer{border-top:1px solid var(--gold-border);padding:44px 64px;display:flex;al
 </nav>
 
 <!-- HERO -->
-<div class="hero">
+<div class="hero" style="padding-bottom: 0; min-height: auto; padding-top: 140px;">
   <div class="hero-bg"></div>
   <div class="hero-grid"></div>
+
   <div class="hero-badge">
     <div class="hero-badge-dot"></div>
-    Now in private beta
+    Now in private beta — limited access
   </div>
-  <h1>Engineering intelligence,<br><em>automated</em></h1>
-  <p class="hero-sub">Meridian watches your signals — Git, Slack, Jira, calendar — and tells you what's actually happening in your engineering org. No standups required.</p>
+
+  <h1>Your engineering org,<br><em>without the standups</em></h1>
+
+  <p class="hero-sub">Meridian reads every signal your team already generates — commits, messages, tickets, calendar — and tells you what's actually happening. Drift detected. Risks surfaced. Opportunities proposed. Automatically.</p>
+
   <div class="hero-actions">
-    <a href="#" class="btn-hero">Request early access</a>
-    <a href="#product" class="btn-hero-ghost">See how it works ↓</a>
+    <a href="https://forms.gle/meridian-waitlist" target="_blank" class="btn-hero">Join the waitlist</a>
+    <a href="#product" class="btn-hero-ghost">See it in action ↓</a>
   </div>
-  <div class="hero-stats">
-    <div class="hero-stat">
-      <div class="hero-stat-num">80%</div>
-      <div class="hero-stat-label">fewer standups</div>
+
+  <!-- Hero visual: animated signal feed panel -->
+  <div style="width:100%; max-width:900px; margin: 64px auto 0; position:relative; z-index:1;">
+    <!-- Glow behind the panel -->
+    <div style="position:absolute; inset:-40px; background:radial-gradient(ellipse 70% 60% at 50% 40%, rgba(29,184,122,0.10) 0%, transparent 70%); pointer-events:none; z-index:0;"></div>
+
+    <!-- Top fade -->
+    <div style="position:absolute; top:0; left:0; right:0; height:32px; background:linear-gradient(to bottom, var(--bg), transparent); z-index:10; pointer-events:none;"></div>
+
+    <!-- Panel -->
+    <div style="position:relative; z-index:1; background:var(--bg2); border:0.5px solid var(--border2); border-radius:16px; overflow:hidden; box-shadow:0 0 0 1px rgba(29,184,122,0.08), 0 40px 80px rgba(0,0,0,0.5);">
+
+      <!-- Window chrome -->
+      <div style="background:var(--bg3); border-bottom:0.5px solid var(--border); padding:12px 20px; display:flex; align-items:center; gap:8px;">
+        <div style="width:10px;height:10px;border-radius:50%;background:#E85555;opacity:0.8;"></div>
+        <div style="width:10px;height:10px;border-radius:50%;background:#E8A825;opacity:0.8;margin-left:2px;"></div>
+        <div style="width:10px;height:10px;border-radius:50%;background:#1DB87A;opacity:0.8;margin-left:2px;"></div>
+        <span style="margin-left:12px; font-family:var(--font-mono); font-size:11px; color:var(--text3);">meridian / live-signals</span>
+        <span style="margin-left:auto; font-family:var(--font-mono); font-size:10px; color:var(--green); display:flex; align-items:center; gap:5px;">
+          <span style="width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 2s infinite;"></span>
+          LIVE · 4 sources connected
+        </span>
+      </div>
+
+      <!-- Two-column layout: feed + sidebar -->
+      <div id="hero-panel-cols" style="display:grid; grid-template-columns:1fr 300px;">
+
+        <!-- Signal feed -->
+        <div style="padding:16px; border-right:0.5px solid var(--border);">
+          <div style="font-size:10px; font-weight:600; font-family:var(--font-mono); color:var(--text3); letter-spacing:0.08em; margin-bottom:12px;">SIGNAL FEED · REAL-TIME</div>
+
+          <!-- Animated signal rows -->
+          <div id="hero-feed" style="display:flex; flex-direction:column; gap:8px;">
+            <div class="hero-sig" style="background:rgba(29,184,122,0.06); border:0.5px solid rgba(29,184,122,0.2); border-radius:8px; padding:10px 12px; display:flex; align-items:flex-start; gap:10px; animation:heroSigIn 0.4s ease forwards;">
+              <span style="font-size:9px;font-weight:700;font-family:var(--font-mono);background:var(--amber-dim);color:var(--amber);padding:2px 6px;border-radius:3px;white-space:nowrap;margin-top:1px;">GIT</span>
+              <div style="flex:1; min-width:0;">
+                <div style="font-size:12px; color:var(--text); line-height:1.4;">feat: add retry logic to payment processor</div>
+                <div style="font-size:10px; color:var(--text3); margin-top:2px;">@sarah · payments-service · 2m ago</div>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0;">
+                <span style="font-size:9px;font-weight:700;font-family:var(--font-mono);background:var(--green-dim);color:var(--green);padding:2px 6px;border-radius:3px;">BUILD</span>
+                <div style="width:40px;height:3px;border-radius:2px;background:var(--bg4);overflow:hidden;"><div style="width:94%;height:100%;background:var(--green);border-radius:2px;"></div></div>
+              </div>
+            </div>
+
+            <div class="hero-sig" style="background:rgba(232,85,85,0.05); border:0.5px solid rgba(232,85,85,0.2); border-radius:8px; padding:10px 12px; display:flex; align-items:flex-start; gap:10px; animation:heroSigIn 0.4s ease 0.15s both;">
+              <span style="font-size:9px;font-weight:700;font-family:var(--font-mono);background:var(--blue-dim);color:var(--blue);padding:2px 6px;border-radius:3px;white-space:nowrap;margin-top:1px;">SLACK</span>
+              <div style="flex:1; min-width:0;">
+                <div style="font-size:12px; color:var(--text); line-height:1.4;">blocked on auth dependency — waiting since Tuesday</div>
+                <div style="font-size:10px; color:var(--text3); margin-top:2px;">@james · #payments · 5m ago</div>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0;">
+                <span style="font-size:9px;font-weight:700;font-family:var(--font-mono);background:var(--red-dim);color:var(--red);padding:2px 6px;border-radius:3px;">BLOCK</span>
+                <div style="width:40px;height:3px;border-radius:2px;background:var(--bg4);overflow:hidden;"><div style="width:88%;height:100%;background:var(--red);border-radius:2px;"></div></div>
+              </div>
+            </div>
+
+            <div class="hero-sig" style="background:rgba(232,168,37,0.05); border:0.5px solid rgba(232,168,37,0.2); border-radius:8px; padding:10px 12px; display:flex; align-items:flex-start; gap:10px; animation:heroSigIn 0.4s ease 0.30s both;">
+              <span style="font-size:9px;font-weight:700;font-family:var(--font-mono);background:var(--green-dim);color:var(--green);padding:2px 6px;border-radius:3px;white-space:nowrap;margin-top:1px;">JIRA</span>
+              <div style="flex:1; min-width:0;">
+                <div style="font-size:12px; color:var(--text); line-height:1.4;">auth-service marked "Done" — no deploy signal detected in 48h</div>
+                <div style="font-size:10px; color:var(--amber); margin-top:2px; font-weight:500;">⚠ Drift detected · @marcus</div>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0;">
+                <span style="font-size:9px;font-weight:700;font-family:var(--font-mono);background:var(--amber-dim);color:var(--amber);padding:2px 6px;border-radius:3px;">DRIFT</span>
+                <div style="width:40px;height:3px;border-radius:2px;background:var(--bg4);overflow:hidden;"><div style="width:97%;height:100%;background:var(--amber);border-radius:2px;"></div></div>
+              </div>
+            </div>
+
+            <div class="hero-sig" style="background:var(--bg3); border:0.5px solid var(--border); border-radius:8px; padding:10px 12px; display:flex; align-items:flex-start; gap:10px; animation:heroSigIn 0.4s ease 0.45s both;">
+              <span style="font-size:9px;font-weight:700;font-family:var(--font-mono);background:var(--blue-dim);color:var(--blue);padding:2px 6px;border-radius:3px;white-space:nowrap;margin-top:1px;">GIT</span>
+              <div style="flex:1; min-width:0;">
+                <div style="font-size:12px; color:var(--text); line-height:1.4;">fix: resolve null pointer in checkout flow</div>
+                <div style="font-size:10px; color:var(--text3); margin-top:2px;">@priya · checkout-api · 8m ago</div>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0;">
+                <span style="font-size:9px;font-weight:700;font-family:var(--font-mono);background:var(--red-dim);color:var(--red);padding:2px 6px;border-radius:3px;">FIX</span>
+                <div style="width:40px;height:3px;border-radius:2px;background:var(--bg4);overflow:hidden;"><div style="width:97%;height:100%;background:var(--red);border-radius:2px;"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right sidebar: inference + alert -->
+        <div id="hero-panel-sidebar" style="padding:16px; display:flex; flex-direction:column; gap:12px;">
+          <div style="font-size:10px; font-weight:600; font-family:var(--font-mono); color:var(--text3); letter-spacing:0.08em; margin-bottom:0;">INFERENCE ENGINE</div>
+
+          <!-- Work unit state card -->
+          <div style="background:var(--bg3); border:0.5px solid var(--border); border-radius:8px; padding:12px;">
+            <div style="font-size:10px; color:var(--text3); font-family:var(--font-mono); margin-bottom:8px;">payments-service</div>
+            <div style="font-size:13px; font-weight:500; color:var(--text); margin-bottom:6px;">Payment processor retry</div>
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+              <span style="font-size:9px;font-weight:700;font-family:var(--font-mono);background:var(--green-dim);color:var(--green);padding:2px 7px;border-radius:4px;">IN PROGRESS</span>
+              <span style="font-size:9px;color:var(--text3);">· conf 0.94</span>
+            </div>
+            <div style="height:3px;background:var(--bg4);border-radius:2px;overflow:hidden;"><div style="width:67%;height:100%;background:var(--green);border-radius:2px;transition:width 1s ease;"></div></div>
+            <div style="font-size:10px;color:var(--text3);margin-top:4px;">67% complete · est. 1.4d remaining</div>
+          </div>
+
+          <!-- Alert card -->
+          <div style="background:rgba(232,168,37,0.06); border:0.5px solid rgba(232,168,37,0.22); border-radius:8px; padding:12px;">
+            <div style="display:flex; align-items:flex-start; gap:8px;">
+              <div style="width:18px;height:18px;border-radius:4px;background:var(--amber-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--amber);"><path d="M5 1L9 8H1L5 1z"/><path d="M5 4v2"/><circle cx="5" cy="7.5" r="0.5" fill="currentColor" stroke="none"/></svg>
+              </div>
+              <div>
+                <div style="font-size:11px; font-weight:500; color:var(--amber); margin-bottom:3px;">Drift · auth-service</div>
+                <div style="font-size:11px; color:var(--text2); line-height:1.5;">Claimed Done in standup. No deploy detected in 48h.</div>
+                <div style="font-size:10px; color:var(--text3); margin-top:6px; font-family:var(--font-mono);">→ Surfaced to manager</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Opportunity card -->
+          <div style="background:rgba(29,184,122,0.05); border:0.5px solid rgba(29,184,122,0.18); border-radius:8px; padding:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+              <div style="font-size:10px; font-weight:600; font-family:var(--font-mono); color:var(--green);">OPPORTUNITY</div>
+              <span style="font-family:var(--font-serif); font-size:16px; color:var(--green);">$240k</span>
+            </div>
+            <div style="font-size:12px; font-weight:500; color:var(--text); margin-bottom:4px;">API gateway consolidation</div>
+            <div style="font-size:10px; color:var(--text3); line-height:1.5;">Detected from Confluence · ranked #2 in backlog · 2 engineers matched</div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="hero-stat">
-      <div class="hero-stat-num">24h</div>
-      <div class="hero-stat-label">to first insight</div>
-    </div>
-    <div class="hero-stat">
-      <div class="hero-stat-num">1-click</div>
-      <div class="hero-stat-label">manager approval</div>
-    </div>
+
+    <!-- Bottom fade -->
+    <div style="position:absolute; bottom:0; left:0; right:0; height:80px; background:linear-gradient(to top, var(--bg), transparent); z-index:10; pointer-events:none;"></div>
   </div>
 </div>
+
+<!-- STATS BAR -->
+<div id="stats-bar" style="border-top:0.5px solid var(--border); border-bottom:0.5px solid var(--border); background:var(--bg2); padding:28px 40px; display:flex; justify-content:center; gap:80px; position:relative; z-index:1;">
+  <div style="text-align:center;">
+    <div style="font-family:var(--font-serif); font-size:30px; color:var(--text);">3h</div>
+    <div style="font-size:12px; color:var(--text3); margin-top:4px;">saved per manager, per week</div>
+  </div>
+  <div style="width:0.5px; background:var(--border);"></div>
+  <div style="text-align:center;">
+    <div style="font-family:var(--font-serif); font-size:30px; color:var(--text);">24h</div>
+    <div style="font-size:12px; color:var(--text3); margin-top:4px;">from install to first insight</div>
+  </div>
+  <div style="width:0.5px; background:var(--border);"></div>
+  <div style="text-align:center;">
+    <div style="font-family:var(--font-serif); font-size:30px; color:var(--text);">Zero</div>
+    <div style="font-size:12px; color:var(--text3); margin-top:4px;">engineer workflow changes</div>
+  </div>
+</div>
+
+<!-- PAIN SECTION -->
+<section style="border-bottom:0.5px solid var(--border); background:var(--bg);">
+  <div class="section-label">The problem</div>
+  <div class="section-title">Your team tells you what's happening.<br><em>Meridian shows you.</em></div>
+  <div class="section-body">Most of what you know about your engineering org came from a standup, a Slack message, or a ticket someone remembered to update. It's filtered, delayed, and shaped by whoever was in the room.</div>
+
+  <div id="pain-grid" style="margin-top:48px; display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); border:0.5px solid var(--border); border-radius:12px; overflow:hidden;">
+    <div style="background:var(--bg2); padding:32px 28px;">
+      <div style="font-size:10px; font-weight:600; font-family:var(--font-mono); color:var(--red); letter-spacing:0.08em; margin-bottom:16px;">THE REALITY</div>
+      <div style="font-size:15px; color:var(--text); font-weight:500; margin-bottom:10px; line-height:1.4;">Jira says "Done".<br>Nothing shipped.</div>
+      <div style="font-size:13px; color:var(--text3); line-height:1.6;">Teams update tickets optimistically — or forget entirely. Your status board is a fiction that nobody has time to correct.</div>
+    </div>
+    <div style="background:var(--bg2); padding:32px 28px; border-left:0.5px solid var(--border);">
+      <div style="font-size:10px; font-weight:600; font-family:var(--font-mono); color:var(--amber); letter-spacing:0.08em; margin-bottom:16px;">THE REALITY</div>
+      <div style="font-size:15px; color:var(--text); font-weight:500; margin-bottom:10px; line-height:1.4;">Standups take hours.<br>Surface nothing new.</div>
+      <div style="font-size:13px; color:var(--text3); line-height:1.6;">The average engineering manager spends 3+ hours per week in status-gathering meetings that could be replaced by a Slack message at 8am.</div>
+    </div>
+    <div style="background:var(--bg2); padding:32px 28px; border-left:0.5px solid var(--border);">
+      <div style="font-size:10px; font-weight:600; font-family:var(--font-mono); color:var(--text3); letter-spacing:0.08em; margin-bottom:16px;">THE REALITY</div>
+      <div style="font-size:15px; color:var(--text); font-weight:500; margin-bottom:10px; line-height:1.4;">Blockers surface late.<br>Opportunities never do.</div>
+      <div style="font-size:13px; color:var(--text3); line-height:1.6;">By the time a risk reaches you, it's already a problem. And the projects you should be building are still buried in a Confluence doc nobody reads.</div>
+    </div>
+  </div>
+</section>
 
 <!-- TICKER -->
 <div class="ticker-wrap">
@@ -857,13 +1041,13 @@ footer{border-top:1px solid var(--gold-border);padding:44px 64px;display:flex;al
 <div class="demo-section" id="product">
   <div style="max-width:1200px; margin:0 auto;">
     <div class="section-label">Interactive demo</div>
-    <div class="section-title">Three stages.<br>One continuous loop.</div>
-    <div class="section-body">Meridian moves through Observer → Authority → Proposer automatically. Click each stage to see it in action.</div>
+    <div class="section-title">Three things happen.<br><em>Automatically.</em></div>
+    <div class="section-body">Meridian runs a continuous loop: watch signals → detect drift and risk → surface decisions and opportunities. Click each stage to see it in action.</div>
 
     <div class="demo-tabs" id="demoTabs">
-      <button class="demo-tab active" data-tab="observe">Stage 1 — Observer</button>
-      <button class="demo-tab" data-tab="authority">Stage 2 — Authority</button>
-      <button class="demo-tab" data-tab="propose">Stage 3 — Proposer</button>
+      <button class="demo-tab active" data-tab="observe">1 — Watch signals</button>
+      <button class="demo-tab" data-tab="authority">2 — Detect & update</button>
+      <button class="demo-tab" data-tab="propose">3 — Propose & act</button>
     </div>
 
     <!-- Stage 1: Observer -->
@@ -932,25 +1116,25 @@ footer{border-top:1px solid var(--gold-border);padding:44px 64px;display:flex;al
         </div>
       </div>
       <div class="demo-desc">
-        <h3>Watches what's actually happening</h3>
-        <p>Meridian continuously reads signals from every tool your team uses — Git commits, Slack messages, Jira updates, calendar events — and classifies them into canonical work events in real time.</p>
+        <h3>Reads what your team already produces</h3>
+        <p>Every commit, Slack message, Jira update, and meeting is a signal. Meridian ingests them continuously and classifies intent in real time — no manual input, no new workflows, no behaviour change from your engineers.</p>
         <div class="demo-feature">
           <div class="demo-feature-icon">
             <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="4"/><path d="M6 4v2l1 1"/></svg>
           </div>
-          <div class="demo-feature-text"><strong>Real-time classification</strong> — 12 intent labels, 9 domain categories, confidence scored per signal</div>
+          <div class="demo-feature-text"><strong>Continuous, not periodic</strong> — signals classified as they happen, not batched nightly</div>
         </div>
         <div class="demo-feature">
           <div class="demo-feature-icon">
             <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 6h8M6 2v8"/></svg>
           </div>
-          <div class="demo-feature-text"><strong>No manual input</strong> — engineers keep working as normal. Meridian reads the signals they already generate</div>
+          <div class="demo-feature-text"><strong>Zero engineer overhead</strong> — they keep working as normal. Meridian reads the signals they already generate</div>
         </div>
         <div class="demo-feature">
           <div class="demo-feature-icon">
             <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8L2 5"/></svg>
           </div>
-          <div class="demo-feature-text"><strong>Drift detection</strong> — when a claim doesn't match evidence, it gets flagged automatically</div>
+          <div class="demo-feature-text"><strong>Confidence-scored</strong> — every classification carries a confidence score. Low-confidence signals escalate for review</div>
         </div>
       </div>
     </div>
@@ -982,13 +1166,13 @@ footer{border-top:1px solid var(--gold-border);padding:44px 64px;display:flex;al
             </div>
             <div class="approval-card" id="approval2">
               <div class="approval-header">
-                <div class="approval-title">Drift detected — auth-service</div>
+                <div class="approval-title" style="color:var(--amber);">⚠ Drift — auth-service</div>
                 <span class="approval-badge pending">REVIEW</span>
               </div>
-              <div class="approval-meta">@james claimed "auth migration complete" in standup but no deploy signal detected in the last 48h</div>
+              <div class="approval-meta" style="font-size:13px; color:var(--text); line-height:1.6; padding:10px; background:rgba(232,168,37,0.06); border-radius:6px; border-left:2px solid var(--amber); margin-bottom:12px;">@james claimed "auth migration complete" in standup — but no deploy signal detected in 48 hours.</div>
               <div class="approval-row"><span class="approval-row-label">Claim made</span><span class="approval-row-value">Tuesday standup</span></div>
-              <div class="approval-row"><span class="approval-row-label">Deploy detected</span><span class="approval-row-value" style="color:var(--red)">None</span></div>
-              <div class="approval-row"><span class="approval-row-label">Risk level</span><span class="approval-row-value" style="color:var(--amber)">Medium</span></div>
+              <div class="approval-row"><span class="approval-row-label">Deploy detected</span><span class="approval-row-value" style="color:var(--red);">None</span></div>
+              <div class="approval-row"><span class="approval-row-label">Risk level</span><span class="approval-row-value" style="color:var(--amber);">Medium</span></div>
               <div class="approval-actions">
                 <button class="btn-approve" onclick="approveCard('approval2')">Acknowledge</button>
                 <button class="btn-decline" onclick="declineCard('approval2')">Dismiss</button>
@@ -1108,41 +1292,80 @@ footer{border-top:1px solid var(--gold-border);padding:44px 64px;display:flex;al
 <!-- HOW IT WORKS -->
 <section id="how">
   <div class="section-label">How it works</div>
-  <div class="section-title">From signals<br>to <em>decisions</em></div>
-  <div class="section-body">No months-long implementation. No custom scripting. Connect your tools and Meridian starts learning immediately.</div>
-  <div class="how-grid">
-    <div class="how-cell">
-      <div class="how-num">01</div>
-      <div class="how-icon">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#1DB87A" stroke-width="1.5"><rect x="2" y="3" width="16" height="12" rx="2"/><path d="M6 16h8"/><path d="M10 15v1"/></svg>
+  <div class="section-title">Up and running<br><em>in a day</em></div>
+  <div class="section-body">No months-long implementation. No custom scripting. Connect your tools, and Meridian starts learning your org immediately. Your engineers notice nothing.</div>
+
+  <div style="margin-top:56px; display:flex; flex-direction:column; gap:0; border:0.5px solid var(--border); border-radius:12px; overflow:hidden;">
+
+    <div style="display:grid; grid-template-columns:56px 1fr; align-items:stretch; border-bottom:0.5px solid var(--border);">
+      <div style="background:var(--bg3); display:flex; align-items:center; justify-content:center; border-right:0.5px solid var(--border); padding:28px 0;">
+        <span style="font-family:var(--font-mono); font-size:11px; color:var(--green); font-weight:600;">01</span>
       </div>
-      <h3>Connect your tools</h3>
-      <p>Plug in Git, Slack, Jira, Confluence, and Google Calendar. Most integrations configured in minutes. Meridian runs entirely in your VPC — your data never leaves your infrastructure.</p>
-    </div>
-    <div class="how-cell">
-      <div class="how-num">02</div>
-      <div class="how-icon">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#1DB87A" stroke-width="1.5"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2"/></svg>
+      <div style="background:var(--bg2); padding:28px 32px; display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:center;">
+        <div>
+          <div style="font-size:16px; font-weight:500; color:var(--text); margin-bottom:8px;">Connect your tools</div>
+          <div style="font-size:13px; color:var(--text3); line-height:1.7;">Plug in Git, Slack, Jira, Confluence, Google Calendar. Most integrations are live in minutes. Meridian deploys entirely inside your VPC — your data never leaves your infrastructure.</div>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:6px;">
+          <span style="font-size:11px; font-family:var(--font-mono); background:var(--bg3); border:0.5px solid var(--border2); color:var(--text2); padding:4px 10px; border-radius:100px;">GitHub</span>
+          <span style="font-size:11px; font-family:var(--font-mono); background:var(--bg3); border:0.5px solid var(--border2); color:var(--text2); padding:4px 10px; border-radius:100px;">Slack</span>
+          <span style="font-size:11px; font-family:var(--font-mono); background:var(--bg3); border:0.5px solid var(--border2); color:var(--text2); padding:4px 10px; border-radius:100px;">Jira</span>
+          <span style="font-size:11px; font-family:var(--font-mono); background:var(--bg3); border:0.5px solid var(--border2); color:var(--text2); padding:4px 10px; border-radius:100px;">Confluence</span>
+          <span style="font-size:11px; font-family:var(--font-mono); background:var(--bg3); border:0.5px solid var(--border2); color:var(--text2); padding:4px 10px; border-radius:100px;">Calendar</span>
+          <span style="font-size:11px; font-family:var(--font-mono); background:var(--bg3); border:0.5px solid var(--border2); color:var(--text2); padding:4px 10px; border-radius:100px;">PagerDuty</span>
+          <span style="font-size:11px; font-family:var(--font-mono); background:var(--green-dim); border:0.5px solid rgba(29,184,122,0.2); color:var(--green); padding:4px 10px; border-radius:100px;">+ 9 more</span>
+        </div>
       </div>
-      <h3>Vocabulary bootstraps automatically</h3>
-      <p>Meridian scans your existing tools, extracts your component names, team names, and product areas, and builds a vocabulary map of your org. No manual configuration required.</p>
     </div>
-    <div class="how-cell">
-      <div class="how-num">03</div>
-      <div class="how-icon">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#1DB87A" stroke-width="1.5"><path d="M4 10h12M10 4l6 6-6 6"/></svg>
+
+    <div style="display:grid; grid-template-columns:56px 1fr; align-items:stretch; border-bottom:0.5px solid var(--border);">
+      <div style="background:var(--bg3); display:flex; align-items:center; justify-content:center; border-right:0.5px solid var(--border); padding:28px 0;">
+        <span style="font-family:var(--font-mono); font-size:11px; color:var(--green); font-weight:600;">02</span>
       </div>
-      <h3>Intelligence surfaces to managers</h3>
-      <p>Summaries, risk alerts, and opportunity proposals arrive via Slack and Confluence — the tools you already use. Your engineers keep working exactly as before.</p>
+      <div style="background:var(--bg2); padding:28px 32px; display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:center;">
+        <div>
+          <div style="font-size:16px; font-weight:500; color:var(--text); margin-bottom:8px;">Meridian learns your org</div>
+          <div style="font-size:13px; color:var(--text3); line-height:1.7;">Meridian scans your tools and builds a vocabulary of your components, teams, and product areas — automatically. No manual configuration. Within 24 hours it's classifying signals with production-grade accuracy.</div>
+        </div>
+        <div style="background:var(--bg3); border:0.5px solid var(--border); border-radius:8px; padding:14px; font-family:var(--font-mono); font-size:11px; color:var(--text3);">
+          <div style="color:var(--green); margin-bottom:8px; font-size:10px; letter-spacing:0.06em;">VOCABULARY BOOTSTRAP</div>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <div><span style="color:var(--text2);">components</span> <span style="color:var(--green);">↓</span> payments-service, auth, checkout-api…</div>
+            <div><span style="color:var(--text2);">teams</span> <span style="color:var(--green);">↓</span> platform, growth, mobile…</div>
+            <div><span style="color:var(--text2);">signals</span> <span style="color:var(--green);">↓</span> 3,847 classified in first 24h</div>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <div style="display:grid; grid-template-columns:56px 1fr; align-items:stretch;">
+      <div style="background:var(--bg3); display:flex; align-items:center; justify-content:center; border-right:0.5px solid var(--border); padding:28px 0;">
+        <span style="font-family:var(--font-mono); font-size:11px; color:var(--green); font-weight:600;">03</span>
+      </div>
+      <div style="background:var(--bg2); padding:28px 32px; display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:center;">
+        <div>
+          <div style="font-size:16px; font-weight:500; color:var(--text); margin-bottom:8px;">Intelligence arrives in Slack</div>
+          <div style="font-size:13px; color:var(--text3); line-height:1.7;">Managers get a morning Slack DM with what actually happened overnight — drift alerts, risk flags, and opportunity proposals. One-click decisions. No new tools. No new dashboards to check.</div>
+        </div>
+        <div style="background:var(--bg3); border:0.5px solid var(--border); border-radius:8px; padding:14px;">
+          <div style="font-size:10px; color:var(--text3); font-family:var(--font-mono); margin-bottom:10px;">Slack DM · 08:02</div>
+          <div style="font-size:12px; color:var(--text2); line-height:1.7;">
+            <div style="margin-bottom:4px;">☑ <span style="color:var(--text);">payments-service</span> — 67% complete, on track</div>
+            <div style="margin-bottom:4px; color:var(--amber);">⚠ auth-service drift — claimed Done, no deploy</div>
+            <div style="color:var(--green);">✦ New opportunity — API consolidation, $240k ROI</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
 
 <!-- ENGINEER INTELLIGENCE -->
 <section id="engineer-intel" style="border-top: 0.5px solid var(--border);">
   <div class="section-label">Engineer Intelligence</div>
-  <div class="section-title">Profiles built from<br><em>signals, not self-reports</em></div>
-  <div class="section-body">Meridian builds a living intelligence profile for every engineer — from what they actually do. Click any engineer in the sidebar to explore their profile.</div>
+  <div class="section-title">Know your team's capacity,<br><em>without asking them</em></div>
+  <div class="section-body">Every engineer gets a living profile — domain expertise, velocity, availability — built entirely from signals. No self-reporting. No surveys. Click any engineer in the sidebar.</div>
 
   <!-- FULL DASHBOARD -->
   <div style="margin-top:48px; background:#0D1117; border:0.5px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; font-size:13px; font-family:var(--font);">
@@ -1496,7 +1719,8 @@ footer{border-top:1px solid var(--gold-border);padding:44px 64px;display:flex;al
 <!-- COMPARISON -->
 <section id="compare" style="border-top: 0.5px solid var(--border);">
   <div class="section-label">Compare</div>
-  <div class="section-title">What Jira can't do.<br><em>What Rovo won't do.</em></div>
+  <div class="section-title">The source of truth<br><em>is what actually happened</em></div>
+  <div style="font-size:15px; color:var(--text3); max-width:520px; margin-top:16px; line-height:1.7; font-weight:300;">Jira knows what someone typed. Rovo knows what Jira contains. Meridian knows what actually happened — and it will contradict both when the evidence says to.</div>
   <div class="compare-table-wrap">
   <table class="compare-table">
     <thead>
@@ -1582,13 +1806,14 @@ footer{border-top:1px solid var(--gold-border);padding:44px 64px;display:flex;al
 
 <!-- QUOTE -->
 <section style="border-top: 0.5px solid var(--border); padding-top: 80px; padding-bottom: 80px;">
-  <div class="quote-block">
+  <div class="section-label" style="margin-bottom:40px;">From the pilot</div>
+  <div class="quote-block" style="background: linear-gradient(135deg, rgba(29,184,122,0.04) 0%, var(--bg2) 60%); border-color: rgba(29,184,122,0.18);">
     <div class="quote-text">"We were spending three hours a week in standups gathering status that Meridian now surfaces automatically. Our managers finally have time to do actual management."</div>
     <div class="quote-author">
-      <div class="quote-avatar">JR</div>
+      <div class="quote-avatar" style="background:rgba(29,184,122,0.12); color:var(--green); border-color:rgba(29,184,122,0.25);">JR</div>
       <div>
         <div class="quote-name">Jamie Rodriguez</div>
-        <div class="quote-role">VP Engineering, Series B fintech</div>
+        <div class="quote-role">VP Engineering · Series B fintech · 40-person eng team</div>
       </div>
     </div>
   </div>
@@ -1596,11 +1821,22 @@ footer{border-top:1px solid var(--gold-border);padding:44px 64px;display:flex;al
 
 <!-- CTA -->
 <div class="cta-section">
-  <h2>Stop asking what's happening.<br>Start knowing.</h2>
-  <p>Meridian is in private beta. Join the waitlist and get early access for your engineering team.</p>
+  <div style="display:inline-flex; align-items:center; gap:8px; background:var(--green-dim); border:0.5px solid rgba(29,184,122,0.25); border-radius:100px; padding:5px 14px 5px 8px; margin-bottom:32px; font-size:12px; color:var(--green); font-weight:500; font-family:var(--font-mono); letter-spacing:0.04em;">
+    <span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 2s infinite;"></span>
+    Private beta · limited spots remaining
+  </div>
+  <h2>Stop asking what's happening.<br><em>Start knowing.</em></h2>
+  <p>Join the waitlist for early access. We're onboarding pilot teams now — deployment takes one day, insights start the next morning.</p>
   <div class="cta-buttons">
-    <a href="#" class="btn-hero">Join the waitlist</a>
-    <a href="#" class="btn-hero-ghost">Talk to founders</a>
+    <a href="https://forms.gle/meridian-waitlist" target="_blank" class="btn-hero">Join the waitlist →</a>
+    <a href="mailto:hello@thegrinlab.com" class="btn-hero-ghost">Talk to the founders</a>
+  </div>
+  <div style="margin-top:40px; font-size:12px; color:var(--text3); display:flex; align-items:center; justify-content:center; gap:20px; font-family:var(--font-mono);">
+    <span>✓ Deploys in your VPC</span>
+    <span style="opacity:0.3;">·</span>
+    <span>✓ No engineer workflow changes</span>
+    <span style="opacity:0.3;">·</span>
+    <span>✓ 24h to first insight</span>
   </div>
 </div>
 
@@ -1776,11 +2012,10 @@ footer{border-top:1px solid var(--gold-border);padding:44px 64px;display:flex;al
 document.getElementById('meridian-card').addEventListener('click', function() {
   document.getElementById('view-home').style.display = 'none';
   document.getElementById('view-meridian').style.display = 'block';
-  // Activate Meridian styles
   document.getElementById('meridian-styles').removeAttribute('media');
   window.scrollTo(0, 0);
-  // Init chart if not done
   if (typeof buildChart === 'function') buildChart();
+  startHeroFeed();
 });
 
 document.getElementById('back-btn').addEventListener('click', function() {
@@ -1788,6 +2023,57 @@ document.getElementById('back-btn').addEventListener('click', function() {
   document.getElementById('view-home').style.display = 'block';
   window.scrollTo(0, 0);
 });
+
+// Hero feed auto-cycle
+const heroSignals = [
+  { bg:'rgba(29,184,122,0.06)', border:'rgba(29,184,122,0.2)', src:'GIT', srcBg:'var(--amber-dim)', srcColor:'var(--amber)', text:'feat: migrate auth tokens to short-lived JWTs', meta:'@priya · auth-service · just now', tag:'BUILD', tagBg:'var(--green-dim)', tagColor:'var(--green)', conf:'91%', confColor:'var(--green)' },
+  { bg:'rgba(232,85,85,0.05)', border:'rgba(232,85,85,0.18)', src:'SLACK', srcBg:'var(--blue-dim)', srcColor:'var(--blue)', text:'P1 — checkout down in ap-southeast-1', meta:'@oncall · #incidents · just now', tag:'INCIDENT', tagBg:'var(--red-dim)', tagColor:'var(--red)', conf:'98%', confColor:'var(--red)' },
+  { bg:'var(--bg3)', border:'var(--border)', src:'JIRA', srcBg:'var(--green-dim)', srcColor:'var(--green)', text:'deploy payments-service v3.1.2 to production', meta:'@marcus · #deployments · just now', tag:'DEPLOY', tagBg:'var(--blue-dim)', tagColor:'var(--blue)', conf:'95%', confColor:'var(--blue)' },
+  { bg:'rgba(232,168,37,0.05)', border:'rgba(232,168,37,0.2)', src:'SLACK', srcBg:'var(--blue-dim)', srcColor:'var(--blue)', text:'still waiting on design review, could slip Q2', meta:'@dan · #platform · just now', tag:'RISK', tagBg:'var(--amber-dim)', tagColor:'var(--amber)', conf:'84%', confColor:'var(--amber)' },
+  { bg:'var(--bg3)', border:'var(--border)', src:'GIT', srcBg:'var(--amber-dim)', srcColor:'var(--amber)', text:'refactor: extract rate-limiter into shared middleware', meta:'@alice · api-gateway · just now', tag:'REFACTOR', tagBg:'var(--amber-dim)', tagColor:'var(--amber)', conf:'89%', confColor:'var(--amber)' },
+];
+let heroIdx = 0;
+let heroTimer = null;
+
+function startHeroFeed() {
+  if (heroTimer) return;
+  heroTimer = setInterval(function() {
+    const feed = document.getElementById('hero-feed');
+    if (!feed) return;
+    const s = heroSignals[heroIdx % heroSignals.length];
+    heroIdx++;
+    const item = document.createElement('div');
+    item.className = 'hero-sig';
+    item.style.cssText = `background:${s.bg}; border:0.5px solid ${s.border}; border-radius:8px; padding:10px 12px; display:flex; align-items:flex-start; gap:10px; opacity:0; transform:translateY(10px); transition:all 0.4s ease;`;
+    item.innerHTML = `
+      <span style="font-size:9px;font-weight:700;font-family:var(--font-mono);background:${s.srcBg};color:${s.srcColor};padding:2px 6px;border-radius:3px;white-space:nowrap;margin-top:1px;">${s.src}</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;color:var(--text);line-height:1.4;">${s.text}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px;">${s.meta}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">
+        <span style="font-size:9px;font-weight:700;font-family:var(--font-mono);background:${s.tagBg};color:${s.tagColor};padding:2px 6px;border-radius:3px;">${s.tag}</span>
+        <div style="width:40px;height:3px;border-radius:2px;background:var(--bg4);overflow:hidden;"><div style="width:0%;height:100%;background:${s.confColor};border-radius:2px;transition:width 0.6s ease;" data-w="${s.conf}"></div></div>
+      </div>`;
+    feed.insertBefore(item, feed.firstChild);
+    // Animate in
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        item.style.opacity = '1';
+        item.style.transform = 'translateY(0)';
+        const bar = item.querySelector('[data-w]');
+        if (bar) bar.style.width = bar.dataset.w;
+      });
+    });
+    // Remove oldest if >5
+    while (feed.children.length > 5) {
+      const last = feed.lastElementChild;
+      last.style.opacity = '0';
+      last.style.transform = 'translateY(4px)';
+      setTimeout(() => { if (last.parentNode) last.parentNode.removeChild(last); }, 350);
+    }
+  }, 3200);
+}
 </script>
 
 </body>
