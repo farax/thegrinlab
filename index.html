@@ -269,7 +269,7 @@ footer{border-top:1px solid var(--gold-border);padding:44px 64px;display:flex;al
   .hero-stat-label { font-size: 13px; color: var(--text3); margin-top: 4px; }
 
   /* ── SECTION WRAPPER ── */
-  section { padding: 100px 40px; max-width: 1200px; margin: 0 auto; }
+  section { padding: 100px 40px; max-width: 1200px; margin: 0 auto; box-sizing: border-box; overflow: hidden; }
   .section-full { padding: 100px 0; }
   .section-full > * { max-width: 1200px; margin-left: auto; margin-right: auto; padding-left: 40px; padding-right: 40px; }
   .section-label {
@@ -1295,13 +1295,13 @@ footer{border-top:1px solid var(--gold-border);padding:44px 64px;display:flex;al
   <div class="section-title">Up and running<br><em>in a day</em></div>
   <div class="section-body">No months-long implementation. No custom scripting. Connect your tools, and Meridian starts learning your org immediately. Your engineers notice nothing.</div>
 
-  <div style="margin-top:56px; display:flex; flex-direction:column; gap:0; border:0.5px solid var(--border); border-radius:12px; overflow:hidden;">
+  <div style="margin-top:56px; display:flex; flex-direction:column; gap:0; border:0.5px solid var(--border); border-radius:12px; overflow:hidden; width:100%;">
 
-    <div style="display:grid; grid-template-columns:56px 1fr; align-items:stretch; border-bottom:0.5px solid var(--border);">
-      <div style="background:var(--bg3); display:flex; align-items:center; justify-content:center; border-right:0.5px solid var(--border); padding:28px 0;">
+    <div style="display:grid; grid-template-columns:56px 1fr; align-items:stretch; border-bottom:0.5px solid var(--border); min-width:0;">
+      <div style="background:var(--bg3); display:flex; align-items:center; justify-content:center; border-right:0.5px solid var(--border); padding:28px 0; flex-shrink:0;">
         <span style="font-family:var(--font-mono); font-size:11px; color:var(--green); font-weight:600;">01</span>
       </div>
-      <div style="background:var(--bg2); padding:28px 32px; display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:center;">
+      <div style="background:var(--bg2); padding:28px 32px; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:32px; align-items:center; min-width:0;">
         <div>
           <div style="font-size:16px; font-weight:500; color:var(--text); margin-bottom:8px;">Connect your tools</div>
           <div style="font-size:13px; color:var(--text3); line-height:1.7;">Plug in Git, Slack, Jira, Confluence, Google Calendar. Most integrations are live in minutes. Meridian deploys entirely inside your VPC — your data never leaves your infrastructure.</div>
@@ -1318,16 +1318,16 @@ footer{border-top:1px solid var(--gold-border);padding:44px 64px;display:flex;al
       </div>
     </div>
 
-    <div style="display:grid; grid-template-columns:56px 1fr; align-items:stretch; border-bottom:0.5px solid var(--border);">
-      <div style="background:var(--bg3); display:flex; align-items:center; justify-content:center; border-right:0.5px solid var(--border); padding:28px 0;">
+    <div style="display:grid; grid-template-columns:56px 1fr; align-items:stretch; border-bottom:0.5px solid var(--border); min-width:0;">
+      <div style="background:var(--bg3); display:flex; align-items:center; justify-content:center; border-right:0.5px solid var(--border); padding:28px 0; flex-shrink:0;">
         <span style="font-family:var(--font-mono); font-size:11px; color:var(--green); font-weight:600;">02</span>
       </div>
-      <div style="background:var(--bg2); padding:28px 32px; display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:center;">
+      <div style="background:var(--bg2); padding:28px 32px; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:32px; align-items:center; min-width:0;">
         <div>
           <div style="font-size:16px; font-weight:500; color:var(--text); margin-bottom:8px;">Meridian learns your org</div>
           <div style="font-size:13px; color:var(--text3); line-height:1.7;">Meridian scans your tools and builds a vocabulary of your components, teams, and product areas — automatically. No manual configuration. Within 24 hours it's classifying signals with production-grade accuracy.</div>
         </div>
-        <div style="background:var(--bg3); border:0.5px solid var(--border); border-radius:8px; padding:14px; font-family:var(--font-mono); font-size:11px; color:var(--text3);">
+        <div style="background:var(--bg3); border:0.5px solid var(--border); border-radius:8px; padding:14px; font-family:var(--font-mono); font-size:11px; color:var(--text3); min-width:0; overflow:hidden;">
           <div style="color:var(--green); margin-bottom:8px; font-size:10px; letter-spacing:0.06em;">VOCABULARY BOOTSTRAP</div>
           <div style="display:flex; flex-direction:column; gap:4px;">
             <div><span style="color:var(--text2);">components</span> <span style="color:var(--green);">↓</span> payments-service, auth, checkout-api…</div>
@@ -1338,16 +1338,16 @@ footer{border-top:1px solid var(--gold-border);padding:44px 64px;display:flex;al
       </div>
     </div>
 
-    <div style="display:grid; grid-template-columns:56px 1fr; align-items:stretch;">
-      <div style="background:var(--bg3); display:flex; align-items:center; justify-content:center; border-right:0.5px solid var(--border); padding:28px 0;">
+    <div style="display:grid; grid-template-columns:56px 1fr; align-items:stretch; min-width:0;">
+      <div style="background:var(--bg3); display:flex; align-items:center; justify-content:center; border-right:0.5px solid var(--border); padding:28px 0; flex-shrink:0;">
         <span style="font-family:var(--font-mono); font-size:11px; color:var(--green); font-weight:600;">03</span>
       </div>
-      <div style="background:var(--bg2); padding:28px 32px; display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:center;">
+      <div style="background:var(--bg2); padding:28px 32px; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:32px; align-items:center; min-width:0;">
         <div>
           <div style="font-size:16px; font-weight:500; color:var(--text); margin-bottom:8px;">Intelligence arrives in Slack</div>
           <div style="font-size:13px; color:var(--text3); line-height:1.7;">Managers get a morning Slack DM with what actually happened overnight — drift alerts, risk flags, and opportunity proposals. One-click decisions. No new tools. No new dashboards to check.</div>
         </div>
-        <div style="background:var(--bg3); border:0.5px solid var(--border); border-radius:8px; padding:14px;">
+        <div style="background:var(--bg3); border:0.5px solid var(--border); border-radius:8px; padding:14px; min-width:0;">
           <div style="font-size:10px; color:var(--text3); font-family:var(--font-mono); margin-bottom:10px;">Slack DM · 08:02</div>
           <div style="font-size:12px; color:var(--text2); line-height:1.7;">
             <div style="margin-bottom:4px;">☑ <span style="color:var(--text);">payments-service</span> — 67% complete, on track</div>
