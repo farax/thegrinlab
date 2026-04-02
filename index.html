@@ -42,9 +42,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:cen
 .hero-texture{position:absolute;inset:0;pointer-events:none;opacity:0.028;background-image:repeating-linear-gradient(90deg,rgba(192,152,48,0.6) 0px,transparent 1px,transparent 79px,rgba(192,152,48,0.6) 80px),repeating-linear-gradient(0deg,rgba(192,152,48,0.6) 0px,transparent 1px,transparent 79px,rgba(192,152,48,0.6) 80px);}
 .hero-vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 110% 100% at 50% 50%,transparent 35%,rgba(6,10,18,0.75) 100%);}
 .hero-logo-wrap{position:relative;margin-bottom:56px;width:200px;height:200px;display:flex;align-items:center;justify-content:center;}
-.hero-logo-wrap img{width:154px;height:154px;object-fit:contain;position:relative;z-index:1;filter:drop-shadow(0 0 36px rgba(192,152,48,0.52)) drop-shadow(0 0 72px rgba(192,152,48,0.22));animation:breathe 6s ease-in-out infinite;}
-@keyframes breathe{0%,100%{filter:drop-shadow(0 0 36px rgba(192,152,48,0.52)) drop-shadow(0 0 72px rgba(192,152,48,0.22));}50%{filter:drop-shadow(0 0 56px rgba(192,152,48,0.72)) drop-shadow(0 0 110px rgba(192,152,48,0.32));}}
-.hero-ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:218px;height:218px;border:1px solid rgba(192,152,48,0.13);border-radius:50%;animation:spin 22s linear infinite;}
+.hero-logo-wrap img{width:154px;height:154px;object-fit:contain;position:relative;z-index:1;filter:drop-shadow(0 0 40px rgba(192,152,48,0.55)) drop-shadow(0 0 80px rgba(192,152,48,0.25));animation:breathe 6s ease-in-out infinite;}
+@keyframes breathe{0%,100%{opacity:0.92;}50%{opacity:1;}}.hero-ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:218px;height:218px;border:1px solid rgba(192,152,48,0.13);border-radius:50%;animation:spin 22s linear infinite;}
 .hero-ring2{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:268px;height:268px;border:1px solid rgba(192,152,48,0.06);border-radius:50%;animation:spin 38s linear infinite reverse;}
 @keyframes spin{from{transform:translate(-50%,-50%) rotate(0deg)}to{transform:translate(-50%,-50%) rotate(360deg)}}
 .hero-wordmark{font-family:var(--font);font-size:clamp(60px,9.5vw,116px);font-weight:300;letter-spacing:0.05em;line-height:1;position:relative;z-index:1;margin-bottom:6px;}
@@ -2036,6 +2035,7 @@ document.getElementById('meridian-card').addEventListener('click', function() {
 });
 
 document.getElementById('back-btn').addEventListener('click', function() {
+  if (heroTimer) { clearInterval(heroTimer); heroTimer = null; }
   document.getElementById('view-meridian').style.display = 'none';
   document.getElementById('view-home').style.display = 'block';
   window.scrollTo(0, 0);
@@ -2053,43 +2053,36 @@ let heroIdx = 0;
 let heroTimer = null;
 
 function startHeroFeed() {
-  if (heroTimer) return;
+  if (heroTimer) {
+    clearInterval(heroTimer);
+    heroTimer = null;
+  }
   heroTimer = setInterval(function() {
-    const feed = document.getElementById('hero-feed');
-    if (!feed) return;
-    const s = heroSignals[heroIdx % heroSignals.length];
+    var feed = document.getElementById('hero-feed');
+    if (!feed) { clearInterval(heroTimer); heroTimer = null; return; }
+    var s = heroSignals[heroIdx % heroSignals.length];
     heroIdx++;
-    const item = document.createElement('div');
+    var item = document.createElement('div');
     item.className = 'hero-sig';
-    item.style.cssText = `background:${s.bg}; border:0.5px solid ${s.border}; border-radius:8px; padding:10px 12px; display:flex; align-items:flex-start; gap:10px; opacity:0; transform:translateY(10px); transition:all 0.4s ease;`;
-    item.innerHTML = `
-      <span style="font-size:9px;font-weight:700;font-family:var(--font-mono);background:${s.srcBg};color:${s.srcColor};padding:2px 6px;border-radius:3px;white-space:nowrap;margin-top:1px;">${s.src}</span>
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:12px;color:var(--text);line-height:1.4;">${s.text}</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:2px;">${s.meta}</div>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">
-        <span style="font-size:9px;font-weight:700;font-family:var(--font-mono);background:${s.tagBg};color:${s.tagColor};padding:2px 6px;border-radius:3px;">${s.tag}</span>
-        <div style="width:40px;height:3px;border-radius:2px;background:var(--bg4);overflow:hidden;"><div style="width:0%;height:100%;background:${s.confColor};border-radius:2px;transition:width 0.6s ease;" data-w="${s.conf}"></div></div>
-      </div>`;
+    item.style.cssText = 'background:' + s.bg + '; border:0.5px solid ' + s.border + '; border-radius:8px; padding:10px 12px; display:flex; align-items:flex-start; gap:10px; opacity:0; transition:opacity 0.4s ease;';
+    item.innerHTML =
+      '<span style="font-size:9px;font-weight:700;font-family:var(--font-mono);background:' + s.srcBg + ';color:' + s.srcColor + ';padding:2px 6px;border-radius:3px;white-space:nowrap;margin-top:1px;">' + s.src + '</span>' +
+      '<div style="flex:1;min-width:0;"><div style="font-size:12px;color:var(--text);line-height:1.4;">' + s.text + '</div><div style="font-size:10px;color:var(--text3);margin-top:2px;">' + s.meta + '</div></div>' +
+      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;"><span style="font-size:9px;font-weight:700;font-family:var(--font-mono);background:' + s.tagBg + ';color:' + s.tagColor + ';padding:2px 6px;border-radius:3px;">' + s.tag + '</span>' +
+      '<div style="width:40px;height:3px;border-radius:2px;background:var(--bg4);overflow:hidden;"><div style="width:0%;height:100%;background:' + s.confColor + ';border-radius:2px;transition:width 0.6s ease;" data-w="' + s.conf + '"></div></div></div>';
     feed.insertBefore(item, feed.firstChild);
-    // Animate in
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        item.style.opacity = '1';
-        item.style.transform = 'translateY(0)';
-        const bar = item.querySelector('[data-w]');
-        if (bar) bar.style.width = bar.dataset.w;
-      });
-    });
-    // Remove oldest if >5
-    while (feed.children.length > 5) {
-      const last = feed.lastElementChild;
-      last.style.opacity = '0';
-      last.style.transform = 'translateY(4px)';
-      setTimeout(() => { if (last.parentNode) last.parentNode.removeChild(last); }, 350);
+    // Fade in after paint
+    setTimeout(function() {
+      item.style.opacity = '1';
+      var bar = item.querySelector('[data-w]');
+      if (bar) bar.style.width = bar.dataset.w;
+    }, 30);
+    // Remove oldest if >4
+    while (feed.children.length > 4) {
+      var last = feed.lastElementChild;
+      if (last) last.parentNode.removeChild(last);
     }
-  }, 3200);
+  }, 5000);
 }
 </script>
 
