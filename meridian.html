@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meridian — Engineering Intelligence, Automated</title>
+<meta name="description" content="Meridian watches your Git, Slack, Jira, and calendar — and tells you what's actually happening in your engineering org.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #0d0d0b;
+  --bg2:       #111110;
+  --bg3:       #161614;
+  --bg4:       #1c1c1a;
+  --teal:      #1D9E75;
+  --teal2:     #9fe1cb;
+  --teal-dim:  rgba(29,158,117,0.1);
+  --teal-border: rgba(29,158,117,0.22);
+  --amber:     #E8A825;
+  --amber-dim: rgba(232,168,37,0.1);
+  --red:       #E85555;
+  --red-dim:   rgba(232,85,85,0.1);
+  --blue:      #4A9EE8;
+  --blue-dim:  rgba(74,158,232,0.1);
+  --text:      #e8e6e0;
+  --text2:     #555550;
+  --text3:     #2e2e2a;
+  --border:    rgba(255,255,255,0.06);
+  --border2:   rgba(255,255,255,0.1);
+  --font:      'DM Sans', sans-serif;
+  --serif:     'Instrument Serif', serif;
+  --mono:      'DM Mono', monospace;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* ── SHARED LOGO MACRO ── */
+.logo-svg { display: block; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px; height: 64px;
+  background: rgba(13,13,11,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 0.5px solid var(--border);
+}
+
+.nav-left { display: flex; align-items: center; gap: 24px; }
+.nav-back {
+  font-size: 12px; color: var(--text2); text-decoration: none;
+  display: flex; align-items: center; gap: 6px;
+  transition: color 0.2s;
+}
+.nav-back:hover { color: var(--teal2); }
+.nav-sep { width: 1px; height: 18px; background: var(--border2); }
+.nav-product { font-size: 12px; color: var(--text3); font-family: var(--mono); letter-spacing: 0.06em; }
+
+.nav-links { display: flex; align-items: center; gap: 28px; }
+.nav-links a {
+  font-size: 12px; color: var(--text2); text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--text); }
+
+.nav-cta {
+  font-size: 12px; font-weight: 500;
+  background: var(--teal); color: var(--bg);
+  padding: 7px 18px; border-radius: 6px;
+  text-decoration: none; transition: all 0.2s; border: none;
+}
+.nav-cta:hover { background: var(--teal2); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 120px 48px 100px;
+  text-align: center;
+  position: relative; overflow: hidden;
+}
+
+.hero-glow {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 700px; height: 500px; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 0%, rgba(29,158,117,0.08) 0%, transparent 65%);
+}
+
+.hero-grid {
+  position: absolute; inset: 0; pointer-events: none; opacity: 0.2;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 0%, black 20%, transparent 75%);
+}
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--teal-dim); border: 0.5px solid var(--teal-border);
+  border-radius: 20px; padding: 5px 16px;
+  font-size: 11px; color: var(--teal);
+  margin-bottom: 40px; letter-spacing: 0.06em;
+  font-family: var(--mono);
+}
+.hero-badge-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--teal);
+  animation: pulse 2.4s ease infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+
+.hero h1 {
+  font-family: var(--serif);
+  font-size: clamp(44px, 7vw, 84px);
+  font-weight: 400; line-height: 1.08;
+  letter-spacing: -1px;
+  color: var(--text); max-width: 800px;
+  margin-bottom: 24px;
+}
+.hero h1 em { font-style: italic; color: var(--teal2); }
+
+.hero-sub {
+  font-size: 17px; font-weight: 300;
+  color: var(--text2); line-height: 1.7;
+  max-width: 500px; margin-bottom: 48px;
+}
+
+.hero-ctas { display: flex; gap: 12px; justify-content: center; margin-bottom: 72px; }
+
+.btn-primary {
+  background: var(--teal); color: var(--bg);
+  font-size: 13px; font-weight: 600;
+  padding: 12px 26px; border-radius: 7px;
+  border: none; cursor: pointer; text-decoration: none;
+  transition: all 0.2s; display: inline-block;
+}
+.btn-primary:hover { background: var(--teal2); transform: translateY(-1px); }
+
+.btn-ghost {
+  background: transparent; color: var(--text2);
+  font-size: 13px; font-weight: 400;
+  padding: 12px 24px; border-radius: 7px;
+  border: 0.5px solid var(--border2);
+  cursor: pointer; text-decoration: none;
+  transition: all 0.2s; display: inline-block;
+}
+.btn-ghost:hover { color: var(--text); border-color: var(--border2); }
+
+/* Hero stats */
+.hero-stats { display: flex; gap: 56px; }
+.hero-stat { text-align: center; }
+.hero-stat-num {
+  font-family: var(--serif); font-size: 36px;
+  color: var(--text); line-height: 1;
+  margin-bottom: 6px;
+}
+.hero-stat-num em { font-style: normal; color: var(--teal2); }
+.hero-stat-label { font-size: 12px; color: var(--text3); font-family: var(--mono); letter-spacing: 0.06em; }
+
+/* ── TICKER ── */
+.ticker {
+  border-top: 0.5px solid var(--border);
+  border-bottom: 0.5px solid var(--border);
+  padding: 12px 0; overflow: hidden;
+  background: #0a0a09;
+}
+.ticker-inner {
+  display: inline-flex; gap: 0;
+  animation: scroll-ticker 30s linear infinite;
+  white-space: nowrap;
+}
+@keyframes scroll-ticker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.ticker-item {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 0 36px;
+  font-size: 11px; color: var(--text3);
+  font-family: var(--mono); white-space: nowrap;
+}
+.ticker-tag {
+  font-size: 10px; font-weight: 500; padding: 2px 7px;
+  border-radius: 3px; letter-spacing: 0.04em;
+}
+.t-build  { background: rgba(29,158,117,0.12); color: var(--teal); }
+.t-drift  { background: rgba(232,168,37,0.12);  color: var(--amber); }
+.t-block  { background: rgba(232,85,85,0.12);   color: var(--red); }
+.t-opp    { background: rgba(74,158,232,0.1);   color: var(--blue); }
+
+/* ── SECTIONS ── */
+.section { padding: 96px 48px; max-width: 1100px; margin: 0 auto; }
+.section-border { border-top: 0.5px solid var(--border); }
+
+.section-label {
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--teal); margin-bottom: 28px;
+  font-family: var(--mono);
+}
+
+.section-title {
+  font-family: var(--serif);
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 400; line-height: 1.15;
+  max-width: 640px; margin-bottom: 20px;
+}
+.section-title em { font-style: italic; color: var(--teal2); }
+
+.section-body {
+  font-size: 16px; font-weight: 300;
+  color: var(--text2); line-height: 1.8;
+  max-width: 540px;
+}
+
+/* ── PROBLEM CARDS ── */
+.problem-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: var(--border);
+  border: 0.5px solid var(--border); border-radius: 10px;
+  overflow: hidden; margin-top: 48px;
+}
+.problem-card {
+  background: var(--bg2); padding: 36px 32px;
+}
+.problem-tag {
+  font-size: 10px; color: var(--text3);
+  font-family: var(--mono); letter-spacing: 0.1em;
+  margin-bottom: 20px;
+}
+.problem-title {
+  font-size: 17px; font-weight: 400;
+  color: var(--text); line-height: 1.4;
+  margin-bottom: 14px;
+}
+.problem-body {
+  font-size: 13px; color: var(--text2);
+  font-weight: 300; line-height: 1.75;
+}
+
+/* ── HOW IT WORKS ── */
+.steps { display: flex; flex-direction: column; gap: 0; margin-top: 48px; }
+.step {
+  display: grid; grid-template-columns: 64px 1fr;
+  gap: 32px; padding: 36px 0;
+  border-bottom: 0.5px solid var(--border);
+  align-items: start;
+}
+.step:last-child { border-bottom: none; }
+.step-num {
+  font-family: var(--mono); font-size: 11px;
+  color: var(--text3); padding-top: 4px;
+}
+.step-content {}
+.step-title {
+  font-size: 18px; font-weight: 400;
+  color: var(--text); margin-bottom: 10px;
+}
+.step-body {
+  font-size: 14px; color: var(--text2);
+  font-weight: 300; line-height: 1.75;
+  max-width: 520px;
+}
+
+/* ── SIGNAL DEMO ── */
+.demo-wrap {
+  background: var(--bg2); border: 0.5px solid var(--border);
+  border-radius: 12px; overflow: hidden; margin-top: 48px;
+}
+.demo-header {
+  background: var(--bg3); border-bottom: 0.5px solid var(--border);
+  padding: 12px 20px; display: flex; align-items: center; gap: 8px;
+}
+.demo-dot { width: 8px; height: 8px; border-radius: 50%; }
+.demo-title {
+  font-size: 11px; color: var(--text2);
+  font-family: var(--mono); margin-left: 8px; letter-spacing: 0.06em;
+}
+.demo-live {
+  margin-left: auto; display: flex; align-items: center; gap: 6px;
+  font-size: 10px; color: var(--teal); font-family: var(--mono);
+}
+.demo-live-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--teal);
+  animation: pulse 2s ease infinite;
+}
+.demo-body { padding: 20px; display: flex; flex-direction: column; gap: 8px; }
+.signal {
+  background: var(--bg3); border: 0.5px solid var(--border);
+  border-radius: 8px; padding: 14px 16px;
+  display: flex; align-items: flex-start; gap: 12px;
+}
+.signal-src {
+  font-size: 10px; font-weight: 600; padding: 3px 8px;
+  border-radius: 4px; font-family: var(--mono);
+  white-space: nowrap; margin-top: 2px; letter-spacing: 0.04em;
+}
+.src-git    { background: rgba(232,168,37,0.12); color: var(--amber); }
+.src-slack  { background: rgba(74,158,232,0.1);  color: var(--blue); }
+.src-jira   { background: rgba(29,158,117,0.1);  color: var(--teal); }
+.src-cal    { background: rgba(232,85,85,0.1);   color: var(--red); }
+.signal-text { font-size: 13px; color: var(--text); line-height: 1.5; flex: 1; }
+.signal-meta { font-size: 11px; color: var(--text3); margin-top: 3px; font-family: var(--mono); }
+.signal-intent { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.intent-tag {
+  font-size: 10px; font-weight: 600; padding: 3px 8px;
+  border-radius: 4px; font-family: var(--mono); white-space: nowrap;
+}
+.i-build  { background: rgba(29,158,117,0.1); color: var(--teal); }
+.i-block  { background: rgba(232,85,85,0.1);  color: var(--red); }
+.i-drift  { background: rgba(232,168,37,0.1); color: var(--amber); }
+.i-deploy { background: rgba(74,158,232,0.1); color: var(--blue); }
+.conf-bar { height: 3px; width: 48px; border-radius: 2px; background: var(--bg4); overflow: hidden; }
+.conf-fill { height: 100%; border-radius: 2px; background: var(--teal); }
+
+/* ── COMPARE TABLE ── */
+.compare-wrap {
+  margin-top: 48px; border: 0.5px solid var(--border);
+  border-radius: 12px; overflow: hidden;
+}
+.compare-table { width: 100%; border-collapse: collapse; }
+.compare-table th {
+  padding: 16px 24px; text-align: left;
+  font-size: 11px; font-weight: 500; letter-spacing: 0.08em;
+  color: var(--text2); background: var(--bg2);
+  border-bottom: 0.5px solid var(--border);
+  font-family: var(--mono);
+}
+.compare-table th.col-meridian { color: var(--teal); }
+.compare-table td {
+  padding: 14px 24px; font-size: 13px;
+  border-bottom: 0.5px solid var(--border);
+  color: var(--text2); font-weight: 300;
+}
+.compare-table tr:last-child td { border-bottom: none; }
+.compare-table td:first-child { color: var(--text); font-weight: 400; }
+.compare-table td.yes { color: var(--teal); font-family: var(--mono); font-size: 12px; }
+.compare-table td.no  { color: var(--text3); font-family: var(--mono); font-size: 12px; }
+.compare-table tr:hover td { background: var(--bg2); }
+
+/* ── INTEGRATIONS ── */
+.integrations-grid {
+  display: flex; flex-wrap: wrap; gap: 10px; margin-top: 40px;
+}
+.integration-pill {
+  background: var(--bg2); border: 0.5px solid var(--border);
+  border-radius: 6px; padding: 8px 16px;
+  font-size: 12px; color: var(--text2);
+  transition: all 0.2s;
+}
+.integration-pill:hover { border-color: var(--teal-border); color: var(--text); }
+.integration-pill.featured { border-color: var(--teal-border); color: var(--teal2); }
+
+/* ── QUOTE ── */
+.quote-wrap {
+  background: var(--bg2); border: 0.5px solid var(--border);
+  border-left: 2px solid var(--teal);
+  border-radius: 0 10px 10px 0;
+  padding: 36px 40px; margin-top: 48px; max-width: 680px;
+}
+.quote-text {
+  font-family: var(--serif); font-size: 22px;
+  font-weight: 400; font-style: italic;
+  color: var(--text); line-height: 1.6; margin-bottom: 20px;
+}
+.quote-attr { font-size: 12px; color: var(--text3); font-family: var(--mono); }
+.quote-attr strong { color: var(--text2); font-weight: 400; }
+
+/* ── CTA SECTION ── */
+.cta-section {
+  text-align: center; padding: 96px 48px;
+  border-top: 0.5px solid var(--border);
+}
+.cta-section h2 {
+  font-family: var(--serif);
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 400; margin-bottom: 16px;
+}
+.cta-section h2 em { font-style: italic; color: var(--teal2); }
+.cta-section p {
+  font-size: 16px; color: var(--text2); font-weight: 300;
+  margin-bottom: 40px; max-width: 420px; margin-left: auto; margin-right: auto;
+}
+.cta-badges {
+  display: flex; justify-content: center; gap: 24px;
+  margin-top: 32px; flex-wrap: wrap;
+}
+.cta-badge {
+  font-size: 11px; color: var(--text3);
+  font-family: var(--mono); display: flex; align-items: center; gap: 6px;
+}
+.cta-badge-check { color: var(--teal); }
+
+/* ── FOOTER ── */
+footer {
+  border-top: 0.5px solid var(--border);
+  padding: 28px 48px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.footer-right {
+  font-family: var(--mono); font-size: 10px;
+  color: var(--text3); letter-spacing: 0.06em;
+}
+.footer-links { display: flex; gap: 24px; }
+.footer-links a { font-size: 11px; color: var(--text3); text-decoration: none; }
+.footer-links a:hover { color: var(--text2); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  nav { padding: 0 20px; }
+  .nav-links { display: none; }
+  .hero { padding: 100px 24px 72px; }
+  .hero-stats { gap: 32px; flex-wrap: wrap; justify-content: center; }
+  .section { padding: 64px 24px; }
+  .problem-grid { grid-template-columns: 1fr; }
+  .cta-section { padding: 64px 24px; }
+  footer { padding: 24px; flex-direction: column; gap: 16px; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-left">
+    <a href="/" class="nav-back" aria-label="Back to The Grin Lab">
+      <svg width="90" height="28" viewBox="0 0 90 28" xmlns="http://www.w3.org/2000/svg" class="logo-svg">
+        <text font-family="'DM Sans', sans-serif" font-size="11" font-weight="400" fill="#555550" letter-spacing="1.2" x="50%" y="12" text-anchor="middle">
+          <tspan>the </tspan><tspan font-weight="700" fill="#1D9E75">grin</tspan><tspan font-weight="400" fill="#555550"> lab</tspan>
+        </text>
+        <path d="M 5,18 Q 45,27 85,18" stroke="#1D9E75" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <circle cx="5" cy="18" r="1.5" fill="#1D9E75"/>
+        <circle cx="85" cy="18" r="1.5" fill="#1D9E75"/>
+      </svg>
+    </a>
+    <div class="nav-sep"></div>
+    <span class="nav-product">meridian</span>
+  </div>
+
+  <div class="nav-links">
+    <a href="#product">product</a>
+    <a href="#how">how it works</a>
+    <a href="#compare">compare</a>
+    <a href="#integrations">integrations</a>
+  </div>
+
+  <a href="https://forms.gle/meridian-waitlist" class="nav-cta">join waitlist</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-grid"></div>
+
+  <div class="hero-badge">
+    <div class="hero-badge-dot"></div>
+    now in private beta · limited access
+  </div>
+
+  <h1>Your engineering org,<br><em>without the standups.</em></h1>
+
+  <p class="hero-sub">
+    Meridian reads every signal your team already generates — commits, messages,
+    tickets, calendar — and tells you what's actually happening.
+    Drift detected. Risks surfaced. Opportunities proposed. Automatically.
+  </p>
+
+  <div class="hero-ctas">
+    <a href="https://forms.gle/meridian-waitlist" class="btn-primary">join the waitlist</a>
+    <a href="#product" class="btn-ghost">see it in action ↓</a>
+  </div>
+
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-num"><em>3h</em></div>
+      <div class="hero-stat-label">saved per manager / week</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num"><em>24h</em></div>
+      <div class="hero-stat-label">install to first insight</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num"><em>zero</em></div>
+      <div class="hero-stat-label">engineer workflow changes</div>
+    </div>
+  </div>
+</section>
+
+<!-- SIGNAL TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <div class="ticker-item"><span class="ticker-tag t-build">BUILD</span>payments-service · 3 PRs merged · no Jira update detected</div>
+    <div class="ticker-item"><span class="ticker-tag t-drift">DRIFT</span>auth-service claimed Done · no deploy signal in 48h</div>
+    <div class="ticker-item"><span class="ticker-tag t-opp">OPP</span>API consolidation surfaced from Confluence · $240k ROI · ranked #2</div>
+    <div class="ticker-item"><span class="ticker-tag t-block">BLOCK</span>checkout blocked on auth dependency · 48h unresolved</div>
+    <div class="ticker-item"><span class="ticker-tag t-build">BUILD</span>checkout-api · @priya · fix: null pointer resolved · conf 0.91</div>
+    <div class="ticker-item"><span class="ticker-tag t-drift">DRIFT</span>DISCUSS loop without DECIDE · 4 days · payments · risk: medium</div>
+    <div class="ticker-item"><span class="ticker-tag t-build">BUILD</span>payments-service · 3 PRs merged · no Jira update detected</div>
+    <div class="ticker-item"><span class="ticker-tag t-drift">DRIFT</span>auth-service claimed Done · no deploy signal in 48h</div>
+    <div class="ticker-item"><span class="ticker-tag t-opp">OPP</span>API consolidation surfaced from Confluence · $240k ROI · ranked #2</div>
+    <div class="ticker-item"><span class="ticker-tag t-block">BLOCK</span>checkout blocked on auth dependency · 48h unresolved</div>
+    <div class="ticker-item"><span class="ticker-tag t-build">BUILD</span>checkout-api · @priya · fix: null pointer resolved · conf 0.91</div>
+    <div class="ticker-item"><span class="ticker-tag t-drift">DRIFT</span>DISCUSS loop without DECIDE · 4 days · payments · risk: medium</div>
+  </div>
+</div>
+
+<!-- THE PROBLEM -->
+<section class="section section-border" id="product">
+  <div class="section-label">the problem</div>
+  <h2 class="section-title">Your team tells you what's happening.<br><em>Meridian shows you.</em></h2>
+  <p class="section-body">
+    Most of what you know about your engineering org came from a standup, a Slack message,
+    or a ticket someone remembered to update. It's filtered, delayed, and shaped by whoever was in the room.
+  </p>
+
+  <div class="problem-grid">
+    <div class="problem-card">
+      <div class="problem-tag">THE REALITY</div>
+      <div class="problem-title">Jira says "Done". Nothing shipped.</div>
+      <div class="problem-body">Teams update tickets optimistically — or forget entirely. Your status board is a fiction that nobody has time to correct.</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-tag">THE REALITY</div>
+      <div class="problem-title">Standups take hours. Surface nothing new.</div>
+      <div class="problem-body">The average engineering manager spends 3+ hours per week in status-gathering meetings that could be replaced by a Slack message at 8am.</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-tag">THE REALITY</div>
+      <div class="problem-title">Blockers surface late. Opportunities never do.</div>
+      <div class="problem-body">By the time a risk reaches you, it's already a problem. And the projects you should be building are still buried in a Confluence doc nobody reads.</div>
+    </div>
+  </div>
+</section>
+
+<!-- SIGNAL DEMO -->
+<section class="section section-border">
+  <div class="section-label">signal intelligence</div>
+  <h2 class="section-title">Reads what your team<br><em>already produces.</em></h2>
+  <p class="section-body">Every commit, Slack message, Jira update, and meeting is a signal. Meridian ingests them continuously and classifies intent in real time — no manual input, no new workflows.</p>
+
+  <div class="demo-wrap">
+    <div class="demo-header">
+      <div class="demo-dot" style="background:#333;"></div>
+      <div class="demo-dot" style="background:#333;"></div>
+      <div class="demo-dot" style="background:#333;"></div>
+      <div class="demo-title">meridian / signal-feed</div>
+      <div class="demo-live"><div class="demo-live-dot"></div>live</div>
+    </div>
+    <div class="demo-body">
+      <div class="signal">
+        <div class="signal-src src-git">GIT</div>
+        <div>
+          <div class="signal-text">feat: add retry logic to payment processor</div>
+          <div class="signal-meta">@sarah · payments-service · 2m ago</div>
+        </div>
+        <div class="signal-intent">
+          <div class="intent-tag i-build">BUILD</div>
+          <div class="conf-bar"><div class="conf-fill" style="width:94%;"></div></div>
+        </div>
+      </div>
+      <div class="signal">
+        <div class="signal-src src-slack">SLACK</div>
+        <div>
+          <div class="signal-text">blocked on auth dependency — waiting since Tuesday</div>
+          <div class="signal-meta">@james · #payments · 5m ago</div>
+        </div>
+        <div class="signal-intent">
+          <div class="intent-tag i-block">BLOCK</div>
+          <div class="conf-bar"><div class="conf-fill" style="width:88%;"></div></div>
+        </div>
+      </div>
+      <div class="signal">
+        <div class="signal-src src-jira">JIRA</div>
+        <div>
+          <div class="signal-text">auth-service marked "Done" — no deploy signal detected in 48h</div>
+          <div class="signal-meta">⚠ Drift detected · @marcus</div>
+        </div>
+        <div class="signal-intent">
+          <div class="intent-tag i-drift">DRIFT</div>
+          <div class="conf-bar"><div class="conf-fill" style="width:96%;background:var(--amber);"></div></div>
+        </div>
+      </div>
+      <div class="signal">
+        <div class="signal-src src-git">GIT</div>
+        <div>
+          <div class="signal-text">fix: resolve null pointer in checkout flow</div>
+          <div class="signal-meta">@priya · checkout-api · 8m ago</div>
+        </div>
+        <div class="signal-intent">
+          <div class="intent-tag i-build">BUILD</div>
+          <div class="conf-bar"><div class="conf-fill" style="width:91%;"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section section-border" id="how">
+  <div class="section-label">how it works</div>
+  <h2 class="section-title">Up and running<br><em>in a day.</em></h2>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-content">
+        <div class="step-title">Connect your tools</div>
+        <div class="step-body">Plug in Git, Slack, Jira, Confluence, Google Calendar. Most integrations are live in minutes. Meridian deploys entirely inside your VPC — your data never leaves your infrastructure.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-content">
+        <div class="step-title">Meridian learns your org</div>
+        <div class="step-body">Meridian scans your tools and builds a vocabulary of your components, teams, and product areas — automatically. No manual configuration. Within 24 hours it's classifying signals with production-grade accuracy.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-content">
+        <div class="step-title">Intelligence arrives in Slack</div>
+        <div class="step-body">Managers get a morning Slack DM with what actually happened overnight — drift alerts, risk flags, and opportunity proposals. One-click decisions. No new tools. No new dashboards to check.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARE -->
+<section class="section section-border" id="compare">
+  <div class="section-label">compare</div>
+  <h2 class="section-title">The source of truth<br><em>is what actually happened.</em></h2>
+  <p class="section-body">Jira knows what someone typed. Rovo knows what Jira contains. Meridian knows what actually happened — and it will contradict both when the evidence says to.</p>
+
+  <div class="compare-wrap">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th style="width:40%;">capability</th>
+          <th>jira + confluence</th>
+          <th>atlassian rovo</th>
+          <th class="col-meridian">meridian</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Source of truth</td>
+          <td>What humans typed</td>
+          <td>What Jira contains</td>
+          <td class="yes">What actually happened</td>
+        </tr>
+        <tr>
+          <td>Contradicts Jira when evidence says so</td>
+          <td class="no">✗</td>
+          <td class="no">✗</td>
+          <td class="yes">✓</td>
+        </tr>
+        <tr>
+          <td>Proposes new projects from any signal</td>
+          <td class="no">✗</td>
+          <td class="no">✗</td>
+          <td class="yes">✓</td>
+        </tr>
+        <tr>
+          <td>Resourcing plans with capacity data</td>
+          <td class="no">✗</td>
+          <td class="no">✗</td>
+          <td class="yes">✓</td>
+        </tr>
+        <tr>
+          <td>ROI estimates ranked against backlog</td>
+          <td class="no">✗</td>
+          <td class="no">✗</td>
+          <td class="yes">✓</td>
+        </tr>
+        <tr>
+          <td>Requires humans to update tickets</td>
+          <td>Always</td>
+          <td>Relies on Jira hygiene</td>
+          <td class="yes">Never</td>
+        </tr>
+        <tr>
+          <td>Runs in your VPC</td>
+          <td class="no">✗</td>
+          <td class="no">✗</td>
+          <td class="yes">✓</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- INTEGRATIONS -->
+<section class="section section-border" id="integrations">
+  <div class="section-label">integrations</div>
+  <h2 class="section-title">Connects to your<br><em>existing stack.</em></h2>
+  <p class="section-body">Meridian reads from the tools your team already uses. No new workflow. No new habits for your engineers.</p>
+
+  <div class="integrations-grid">
+    <div class="integration-pill featured">GitHub</div>
+    <div class="integration-pill featured">GitLab</div>
+    <div class="integration-pill featured">Slack</div>
+    <div class="integration-pill featured">Jira</div>
+    <div class="integration-pill featured">Confluence</div>
+    <div class="integration-pill featured">Google Calendar</div>
+    <div class="integration-pill">Google Meet</div>
+    <div class="integration-pill">Zoom</div>
+    <div class="integration-pill">Linear</div>
+    <div class="integration-pill">Notion</div>
+    <div class="integration-pill">PagerDuty</div>
+    <div class="integration-pill">Datadog</div>
+    <div class="integration-pill">Bitbucket</div>
+    <div class="integration-pill">Microsoft Teams</div>
+    <div class="integration-pill">Outlook Calendar</div>
+    <div class="integration-pill" style="color:var(--text3);">+ more coming</div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<section class="section section-border">
+  <div class="section-label">from the pilot</div>
+  <div class="quote-wrap">
+    <div class="quote-text">"We were spending three hours a week in standups gathering status that Meridian now surfaces automatically. Our managers finally have time to do actual management."</div>
+    <div class="quote-attr"><strong>Jamie Rodriguez</strong> · VP Engineering · Series B fintech · 40-person eng team</div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2>Stop asking what's happening.<br><em>Start knowing.</em></h2>
+  <p>Join the waitlist for early access. We're onboarding pilot teams now — deployment takes one day, insights start the next morning.</p>
+  <div class="hero-ctas" style="margin-bottom:0;">
+    <a href="https://forms.gle/meridian-waitlist" class="btn-primary">join the waitlist →</a>
+    <a href="mailto:hello@thegrinlab.com" class="btn-ghost">talk to the founders</a>
+  </div>
+  <div class="cta-badges">
+    <div class="cta-badge"><span class="cta-badge-check">✓</span>deploys in your VPC</div>
+    <div class="cta-badge"><span class="cta-badge-check">✓</span>no engineer workflow changes</div>
+    <div class="cta-badge"><span class="cta-badge-check">✓</span>24h to first insight</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="/" aria-label="The Grin Lab">
+    <svg width="100" height="32" viewBox="0 0 100 32" xmlns="http://www.w3.org/2000/svg" class="logo-svg">
+      <text font-family="'DM Sans', sans-serif" font-size="11" font-weight="400" fill="#555550" letter-spacing="1.2" x="50%" y="13" text-anchor="middle">
+        <tspan>the </tspan><tspan font-weight="700" fill="#1D9E75">grin</tspan><tspan font-weight="400" fill="#555550"> lab</tspan>
+      </text>
+      <path d="M 6,20 Q 50,31 94,20" stroke="#1D9E75" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <circle cx="6" cy="20" r="1.5" fill="#1D9E75"/>
+      <circle cx="94" cy="20" r="1.5" fill="#1D9E75"/>
+    </svg>
+  </a>
+  <div class="footer-links">
+    <a href="/">home</a>
+    <a href="mailto:hello@thegrinlab.com">contact</a>
+  </div>
+  <div class="footer-right">© 2026 the grin lab · meridian</div>
+</footer>
+
+</body>
+</html>
